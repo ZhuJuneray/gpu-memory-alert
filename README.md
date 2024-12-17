@@ -1,122 +1,125 @@
 # GPU Memory Alert
 
-`gpu-memory-alert` is a tool to monitor GPU memory usage on a multi-GPU system using `gpustat`. If any GPU's memory usage drops below a specified threshold, an email notification will be sent.
+一个用于监控GPU内存使用率并通过Telegram发送告警的工具。当GPU内存使用率低于设定阈值时，系统会通过Telegram机器人发送通知。
 
-## Installation
+## 功能特点
 
-Follow these steps to install and set up the tool.
+- 实时监控所有可用GPU的内存使用率
+- 可配置的内存使用率阈值
+- 通过Telegram机器人发送告警消息
+- 可设置告警冷却时间，避免过于频繁的通知
+- 支持Docker部署
 
-### 1. **Install the package**:
+## 系统要求
 
-You can install the package from PyPI using `pip`:
+- Python 3.8+
+- NVIDIA GPU
+- NVIDIA驱动程序
+- Docker（可选，用于容器化部署）
 
-```bash
-pip install gpu-memory-alert
+## 配置说明
+
+在开始使用之前，需要配置 `config/config.yaml` 文件：
+
+```yaml
+telegram:
+  bot_token: "YOUR_BOT_TOKEN"  # Telegram机器人的API Token
+  chat_id: "YOUR_CHAT_ID"      # 接收告警消息的Chat ID
+
+monitor:
+  threshold: 20                # GPU内存使用率阈值（百分比）
+  check_interval: 60           # 检查间隔（秒）
+  cooldown: 300               # 两次告警之间的最小间隔（秒）
 ```
 
-Alternatively, you can clone this repository and install the package locally:
+## 安装步骤
 
+### 方法1：直接运行
+
+1. 克隆仓库：
 ```bash
-git clone https://github.com/yourusername/gpu-memory-alert.git
+git clone https://github.com/your-username/gpu-memory-alert.git
 cd gpu-memory-alert
-pip install .
 ```
 
-### 2. **Install required dependencies**:
-
-Make sure you have the necessary dependencies installed, such as `gpustat` for GPU monitoring and `jq` for JSON parsing.
-
-- Install `gpustat`:
-
-  ```bash
-  pip install gpustat
-  ```
-
-- Install `jq` (for JSON parsing). On Ubuntu, you can install it using:
-
-  ```bash
-  sudo apt-get install jq
-  ```
-
-  On macOS, you can use `brew`:
-
-  ```bash
-  brew install jq
-  ```
-
-### 3. **Configure the tool**:
-
-Before running the script, you need to configure the GPU memory threshold and email recipient.
-
-1. **Edit the configuration file (`config/thresholds.conf`)**:
-
-   Open the file `config/thresholds.conf` and set the memory threshold (in MiB) and the email address to receive alerts.
-
-   Example:
-
-   ```bash
-   MEMORY_THRESHOLD=1024   # Set the memory threshold in MiB (1 GB)
-   EMAIL_RECIPIENT=your_email@example.com
-   ```
-
-   - **`MEMORY_THRESHOLD`**: This is the threshold for GPU memory usage. If any GPU's memory usage falls below this value, an email notification will be sent.
-   - **`EMAIL_RECIPIENT`**: This is the email address where you want to receive alerts.
-
-2. **Optional: Configure Email**:
-
-   If you're using `mail` to send notifications, ensure your system is configured to send emails. You can use services like **`sendmail`**, **`Postfix`**, or an SMTP relay. 
-
-   Example configuration for `mail` (on Ubuntu):
-   
-   ```bash
-   sudo apt-get install mailutils
-   ```
-
-### 4. **Running the script manually**:
-
-To run the GPU memory monitoring script manually, execute the following command:
-
+2. 安装依赖：
 ```bash
-gpu-memory-alert
+pip install -r requirements.txt
 ```
 
-This will monitor all GPUs, and if any GPU's memory usage falls below the threshold, an email notification will be sent.
-This is one time runner, if the threshold you set is satisfied, a notification will be sent and the program ends.
+3. 配置设置：
+   - 复制配置模板：`cp config/config.yaml.example config/config.yaml`
+   - 编辑 `config/config.yaml`，填入您的 Telegram Bot Token 和 Chat ID
 
-Alternatively, you can run the monitoring script directly using the shell:
-
+4. 运行程序：
 ```bash
-bash scripts/gpu_memory_notify.sh
+python main.py
 ```
 
-### 5. **Automating the script with cron**:
+### 方法2：Docker部署
 
-You can set up a **cron job** to run the script periodically (e.g., every minute) to automatically monitor the GPU memory and send alerts.
-
-1. Edit your cron jobs:
-
-   ```bash
-   crontab -e
-   ```
-
-2. Add a cron job to run the script every minute:
-
-   ```bash
-   * * * * * /path/to/gpu-memory-alert/scripts/gpu_memory_notify.sh
-   ```
-
-   This will run the script every minute, check the GPU memory usage, and send email alerts if the memory falls below the specified threshold.
-
-### 6. **Log file**:
-
-The script logs its activity in the `logs/gpu_monitor.log` file. You can check this log to track the status of GPU memory checks and notifications.
-
+1. 构建Docker镜像：
 ```bash
-tail -f logs/gpu_monitor.log
+docker build -t gpu-memory-alert .
 ```
 
-This will show the latest entries in the log file in real-time.
+2. 运行容器：
+```bash
+docker run --gpus all \
+  -v $(pwd)/config:/app/config \
+  gpu-memory-alert
+```
 
-## License
+## 获取 Telegram Bot Token 和 Chat ID
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### 获取 Bot Token
+1. 在 Telegram 中找到 @BotFather
+2. 发送 /newbot 命令
+3. 按照提示设置机器人名称
+4. 获得 Bot Token
+
+### 获取 Chat ID
+1. 发送消息给 @userinfobot
+2. 机器人会返回您的 Chat ID
+
+## 告警消息示例
+
+当GPU内存使用率低于阈值时，您将收到类似这样的消息：
+
+```
+🚨 Low GPU Memory Alert:
+
+GPU 0: 15.23% memory usage
+GPU 1: 18.45% memory usage
+```
+
+## 故障排除
+
+1. 确保已安装NVIDIA驱动并且可以使用 `nvidia-smi` 命令
+2. 检查 Telegram Bot Token 是否正确
+3. 确认 Chat ID 格式正确
+4. 检查系统防火墙是否允许程序访问 Telegram API
+
+## 常见问题
+
+Q: 程序无法检测到GPU？
+A: 确保已正确安装NVIDIA驱动，并且可以通过 `nvidia-smi` 命令查看GPU状态。
+
+Q: 没有收到Telegram消息？
+A: 检查网络连接，确保可以访问Telegram API，并验证Bot Token和Chat ID是否正确。
+
+## 日志
+
+程序运行日志将显示在控制台中，包含以下信息：
+- 系统启动状态
+- GPU检测结果
+- 告警发送状态
+- 错误信息（如果有）
+
+## 贡献指南
+
+欢迎提交 Pull Request 或创建 Issue 来帮助改进这个项目。
+
+## 许可证
+
+本项目采用 MIT 许可证。
