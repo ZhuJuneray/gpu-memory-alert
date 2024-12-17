@@ -13,5 +13,4 @@ logs/
 *.env
 .vscode/
 
-config.yaml.example
-
+config/config.yaml

@@ -1,0 +1,8 @@
+telegram:
+  bot_token: "YOUR_BOT_TOKEN"
+  chat_id: "YOUR_CHAT_ID"
+
+monitor:
+  threshold: 20  # GPU memory阈值（百分比）
+  check_interval: 60  # 检查间隔（秒）
+  cooldown: 300  # 两次告警之间的最小间隔（秒）
