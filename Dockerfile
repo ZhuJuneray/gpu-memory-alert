@@ -1,22 +1,22 @@
 FROM nvidia/cuda:11.8.0-base-ubuntu22.04
 
-# 设置工作目录
+# Set working directory
 WORKDIR /app
 
-# 安装Python和pip
+# Install Python and pip
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# 复制项目文件
+# Copy project files
 COPY requirements.txt .
 COPY src/ ./src/
 COPY config/ ./config/
 COPY main.py .
 
-# 安装依赖
+# Install dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# 运行应用
+# Run the application
 CMD ["python3", "main.py"]

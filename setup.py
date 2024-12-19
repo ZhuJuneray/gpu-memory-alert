@@ -1,28 +1,28 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="gpu-memory-alert",  # 你的包名
-    version="0.1.0",          # 版本号
+    name="gpu-memory-alert",  # Your package name
+    version="0.1.0",          # Version number
     packages=find_packages(),
-    install_requires=[        # 依赖项
-        "gpustat",             # GPU 状态监控工具
-        "jq",                  # JSON 解析工具
+    install_requires=[        # Dependencies
+        "gpustat",             # GPU status monitoring tool
+        "jq",                  # JSON parsing tool
     ],
-    entry_points={            # 可执行脚本
+    entry_points={            # Executable scripts
         'console_scripts': [
-            'gpu-memory-alert = scripts.gpu_memory_notify:main',  # 定义主脚本入口
+            'gpu-memory-alert = scripts.gpu_memory_notify:main',  # Define the main script entry point
         ],
     },
-    author="Your Name",  # 你的名字
-    author_email="your_email@example.com",  # 你的电子邮件
-    description="A tool to monitor GPU memory usage and send alerts.",  # 简短描述
-    long_description=open('README.md').read(),  # 详细描述来自 README.md
-    long_description_content_type="text/markdown",  # 说明 README 格式
-    url="https://github.com/yourusername/gpu-memory-alert",  # 项目地址
-    classifiers=[  # 选择器，帮助用户找到你的包
+    author="Your Name",  # Your name
+    author_email="your_email@example.com",  # Your email
+    description="A tool to monitor GPU memory usage and send alerts.",  # Short description
+    long_description=open('README.md').read(),  # Detailed description from README.md
+    long_description_content_type="text/markdown",  # Specify the format of the README
+    url="https://github.com/yourusername/gpu-memory-alert",  # Project URL
+    classifiers=[  # Classifiers help users find your package
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',  # Python 版本要求
+    python_requires='>=3.6',  # Python version requirement
 )

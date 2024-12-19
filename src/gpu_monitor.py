@@ -1,84 +1,49 @@
-import time
-from typing import List, Dict, Optional
-import pynvml
+import requests
+from typing import Optional
 
-class GPUMonitor:
-    def __init__(self, threshold: int, cooldown: int):
+class TelegramBot:
+    def __init__(self, token: str, chat_id: str):
         """
-        初始化GPU监控器
+        Initialize the Telegram bot
         Args:
-            threshold: GPU内存使用率阈值（百分比）
-            cooldown: 两次告警之间的最小间隔（秒）
+            token: The bot's API token
+            chat_id: The chat ID to receive messages
         """
-        self.threshold = threshold
-        self.cooldown = cooldown
-        self.last_alert_time = 0
-        self._init_nvml()
+        self.token = token
+        self.chat_id = chat_id
+        self.api_url = f"https://api.telegram.org/bot{token}"
 
-    def _init_nvml(self):
-        """初始化NVIDIA Management Library"""
+    def send_message(self, message: str) -> Optional[str]:
+        """
+        Send a message
+        Args:
+            message: The content of the message to send
+        Returns:
+            If sending fails, returns an error message; otherwise, returns None
+        """
         try:
-            pynvml.nvmlInit()
-        except pynvml.NVMLError as e:
-            raise Exception(f"Failed to initialize NVML: {e}")
-
-    def _get_gpu_info(self) -> List[Dict[str, float]]:
-        """
-        获取所有GPU的内存使用情况
-        Returns:
-            GPU信息列表，每个元素包含设备ID和内存使用率
-        """
-        gpu_info = []
-        device_count = pynvml.nvmlDeviceGetCount()
-        
-        for i in range(device_count):
-            handle = pynvml.nvmlDeviceGetHandleByIndex(i)
-            memory = pynvml.nvmlDeviceGetMemoryInfo(handle)
-            
-            # 计算内存使用率
-            usage_percent = (memory.used / memory.total) * 100
-            gpu_info.append({
-                'device_id': i,
-                'memory_usage': usage_percent
-            })
-            
-        return gpu_info
-
-    def check_memory(self) -> Optional[str]:
-        """
-        检查GPU内存使用情况
-        Returns:
-            如果有GPU内存低于阈值，返回告警消息；否则返回None
-        """
-        current_time = time.time()
-        
-        # 检查是否在冷却期
-        if current_time - self.last_alert_time < self.cooldown:
+            response = requests.post(
+                f"{self.api_url}/sendMessage",
+                json={
+                    "chat_id": self.chat_id,
+                    "text": message,
+                    "parse_mode": "HTML"
+                }
+            )
+            response.raise_for_status()
             return None
-            
-        try:
-            gpu_info = self._get_gpu_info()
-        except Exception as e:
-            return f"Error getting GPU information: {e}"
-            
-        # 检查是否有GPU内存使用率低于阈值
-        low_memory_gpus = [
-            info for info in gpu_info 
-            if info['memory_usage'] < self.threshold
-        ]
-        
-        if low_memory_gpus:
-            self.last_alert_time = current_time
-            message = "🚨 Low GPU Memory Alert:\n\n"
-            for gpu in low_memory_gpus:
-                message += f"GPU {gpu['device_id']}: {gpu['memory_usage']:.2f}% memory usage\n"
-            return message
-            
-        return None
+        except requests.RequestException as e:
+            return f"Failed to send message: {str(e)}"
 
-    def __del__(self):
-        """清理NVML"""
+    def test_connection(self) -> bool:
+        """
+        Test the connection to the Telegram API
+        Returns:
+            Whether the connection test was successful
+        """
         try:
-            pynvml.nvmlShutdown()
+            response = requests.get(f"{self.api_url}/getMe")
+            response.raise_for_status()
+            return True
         except:
-            pass
+            return False

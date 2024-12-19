@@ -1,3 +1,131 @@
+```markdown
+# GPU Memory Alert
+
+A tool for monitoring GPU memory usage and sending alerts via Telegram. The system sends notifications through a Telegram bot when GPU memory usage falls below a set threshold.
+
+## Features
+
+- Real-time monitoring of memory usage for all available GPUs
+- Configurable memory usage threshold
+- Alert notifications sent via Telegram bot
+- Configurable alert cooldown period to avoid frequent notifications
+- Docker support for easy deployment
+
+## System Requirements
+
+- Python 3.8+
+- NVIDIA GPU
+- NVIDIA Drivers
+- Docker (optional, for containerized deployment)
+
+## Configuration
+
+Before you start, configure the `config/config.yaml` file:
+
+```yaml
+telegram:
+  bot_token: "YOUR_BOT_TOKEN"  # API token for your Telegram bot
+  chat_id: "YOUR_CHAT_ID"      # Chat ID to receive alert messages
+
+monitor:
+  threshold: 20                # GPU memory usage threshold (percentage)
+  check_interval: 60           # Check interval (seconds)
+  cooldown: 300                # Minimum interval between alerts (seconds)
+```
+
+## Installation
+
+### Method 1: Run Directly
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/gpu-memory-alert.git
+cd gpu-memory-alert
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Configure settings:
+   - Copy the config template: `cp config/config.yaml.example config/config.yaml`
+   - Edit `config/config.yaml` and fill in your Telegram Bot Token and Chat ID
+
+4. Run the program:
+```bash
+python main.py
+```
+
+### Method 2: Docker Deployment
+
+1. Build the Docker image:
+```bash
+docker build -t gpu-memory-alert .
+```
+
+2. Run the container:
+```bash
+docker run --gpus all \
+  -v $(pwd)/config:/app/config \
+  gpu-memory-alert
+```
+
+## Obtaining Telegram Bot Token and Chat ID
+
+### Get Bot Token
+1. Find @BotFather on Telegram.
+2. Send the command /newbot.
+3. Follow the prompts to set up your bot name.
+4. Receive your Bot Token.
+
+### Get Chat ID
+1. Send a message to @userinfobot.
+2. The bot will reply with your Chat ID.
+
+## Alert Message Example
+
+When GPU memory usage falls below the threshold, you'll receive a message like this:
+
+```
+🚨 Low GPU Memory Alert:
+
+GPU 0: 15.23% memory usage
+GPU 1: 18.45% memory usage
+```
+
+## Troubleshooting
+
+1. Ensure NVIDIA drivers are installed and that `nvidia-smi` command works.
+2. Check if the Telegram Bot Token is correct.
+3. Verify that the Chat ID is in the correct format.
+4. Ensure your firewall settings allow the program to access the Telegram API.
+
+## Frequently Asked Questions
+
+Q: The program can't detect my GPU?
+A: Make sure NVIDIA drivers are installed and verify GPU status using the `nvidia-smi` command.
+
+Q: I didn't receive any Telegram messages?
+A: Check your internet connection, ensure access to the Telegram API, and verify that the Bot Token and Chat ID are correct.
+
+## Logs
+
+The program logs will display in the console, including:
+- System startup status
+- GPU detection results
+- Alert sending status
+- Error information (if any)
+
+## Contribution Guidelines
+
+Feel free to submit pull requests or create issues to improve this project.
+
+## License
+
+This project is licensed under the MIT License.
+```
+
 # GPU Memory Alert
 
 一个用于监控GPU内存使用率并通过Telegram发送告警的工具。当GPU内存使用率低于设定阈值时，系统会通过Telegram机器人发送通知。

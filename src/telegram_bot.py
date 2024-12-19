@@ -4,10 +4,10 @@ from typing import Optional
 class TelegramBot:
     def __init__(self, token: str, chat_id: str):
         """
-        初始化Telegram机器人
+        Initialize the Telegram bot
         Args:
-            token: 机器人的API token
-            chat_id: 接收消息的chat ID
+            token: The bot's API token
+            chat_id: The chat ID to receive messages
         """
         self.token = token
         self.chat_id = chat_id
@@ -15,11 +15,11 @@ class TelegramBot:
 
     def send_message(self, message: str) -> Optional[str]:
         """
-        发送消息
+        Send a message
         Args:
-            message: 要发送的消息内容
+            message: The content of the message to send
         Returns:
-            如果发送失败，返回错误信息；否则返回None
+            If sending fails, returns an error message; otherwise, returns None
         """
         try:
             response = requests.post(
@@ -37,9 +37,9 @@ class TelegramBot:
 
     def test_connection(self) -> bool:
         """
-        测试与Telegram API的连接
+        Test the connection to the Telegram API
         Returns:
-            连接测试是否成功
+            Whether the connection test was successful
         """
         try:
             response = requests.get(f"{self.api_url}/getMe")
